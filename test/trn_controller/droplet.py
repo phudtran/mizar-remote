@@ -126,9 +126,19 @@ class droplet:
             "[DROPLET {}]: provision_simple_endpoint {}".format(self.id, ep.ip))
 
         self._create_veth_pair(ep)
+        self.load_transit_agent_xdp(ep.veth_peer)
+
+    def provision_host_endpoint(self, ep):
+        """
+        Creates a veth pair and a namespace for the endpoint and loads
+        the transit agent program on the veth peer running in the root
+        namespace.
+        """
+        logger.info(
+            "[DROPLET {}]: provision_simple_endpoint {}".format(self.id, ep.ip))
+
         self._create_host_veth_pair(ep)
         self.load_transit_agent_xdp(ep.veth_peer)
-        self.load_transit_agent_xdp(ep.peer_host)
 
     def unprovision_simple_endpoint(self, ep):
         """
@@ -246,18 +256,18 @@ ip netns exec {ep.ns} ifconfig veth0 hw ether {ep.mac} ' ''')
             "[DROPLET {}]: _create_veth_pair {}".format(self.id, self.control_ip))
 
         script = (f''' sudo bash -c '\
-ip link add {ep.veth_host} type veth peer name {ep.peer_host} && \
-ip link set dev {ep.veth_host} up && \
+ip link add {ep.veth_name} type veth peer name {ep.veth_peer} && \
+ip link set dev {ep.veth_name} up && \
 sysctl -w net.ipv4.tcp_mtu_probing=2 && \
-ethtool -K {ep.veth_host} tso off gso off ufo off && \
-ethtool --offload {ep.veth_host} rx off tx off && \
-ip link set dev {ep.veth_host} up mtu 9000 && \
+ethtool -K {ep.veth_name} tso off gso off ufo off && \
+ethtool --offload {ep.veth_name} rx off tx off && \
+ip link set dev {ep.veth_name} up mtu 9000 && \
 route add default gw {ep.gw_ip} &&  \
 ifconfig lo up &&  \
 ip route {ep.netip} 255.255.255.0 {self.control_ip} ' ''')
 
         self.run(script)
-        self.veth_peers.add(ep.veth_host)
+        self.veth_peers.add(ep.veth_name)
 
     def _delete_veth_pair(self, ep):
         """

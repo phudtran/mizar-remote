@@ -102,6 +102,19 @@ class controller:
         self.log_event_end(inspect.stack()[0][3])
         return ep
 
+    def create_host_endpoint(self, vni, netid, ip, host):
+        """
+        Adds a simple endpoint to an existing network
+        """
+        self.log_event_start(inspect.stack()[0][3])
+        logger.info(
+            "[Controller]: create_host_endpoint {}.{}.{}".format(vni, netid, ip))
+        ep = self.vpcs[vni].create_host_endpoint(
+            netid, ip, self.droplets[host])
+
+        self.log_event_end(inspect.stack()[0][3])
+        return ep
+
     def delete_simple_endpoint(self, vni, netid, ip):
         """
         Deletes a simple endpoint from an existing network

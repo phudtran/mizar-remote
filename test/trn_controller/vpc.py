@@ -170,6 +170,16 @@ class vpc:
             "[VPC {}]: create_simple_endpoint {}".format(self.vni, ip))
         return self.networks[netid].create_simple_endpoint(ip, host)
 
+    def create_host_endpoint(self, netid, ip, host):
+        """
+        Creates a new simple endpoint in a network within the vpc.
+        Since the routers need not to be updated with the endpoint
+        data, this call is just cascaded to the network.
+        """
+        logger.info(
+            "[VPC {}]: create_host_endpoint {}".format(self.vni, ip))
+        return self.networks[netid].create_host_endpoint(ip, host)
+
     def delete_simple_endpoint(self, netid, ip):
         """
         Deletes a simple endpoint in a network within the vpc.

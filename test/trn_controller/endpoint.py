@@ -25,7 +25,7 @@ class endpoint:
     multiple vxlan tunnel keys, subneting, ... etc.
     """
 
-    def __init__(self, vni, netid, ip, prefixlen, gw_ip, host, netip, tuntype='gnv', bridge='br0'):
+    def __init__(self, vni, netid, ip, prefixlen, gw_ip, host, netip, tuntype='gnv', bridge='br0', host_ep=False):
         """
         Defines a simple endpoint in the VPC and network. Also defines
         a phantom endpoint that is not hosted on any host (switch only respond for ARP requests).
@@ -52,8 +52,10 @@ class endpoint:
         self.tunitf = 'tun_' + self.veth_peer  # Only for ovs
         self.ep_bridge = 'br-' + self.ns
         self.netip = netip
-        self.veth_host = "veth_host"
-        self.peer_host = "peer_host"
+        self.host_ep = host_ep
+        if host_ep:
+            self.veth_name = "veth_host"
+            self.veth_peer = "peer_host"
 
         self.qvb = 'qvb-' + self.ns
         self.qvo = 'qvo-' + self.ns
@@ -89,6 +91,9 @@ class endpoint:
 
         if self.tuntype == 'vxn':
             self.bridge_port = self.host.provision_vxlan_endpoint(self)
+        elif self.host_ep:
+            self.transit_agent = transit_agent(self.veth_peer, self.host)
+            self.host.provision_host_endpoint(self)
         else:
             self.transit_agent = transit_agent(self.veth_peer, self.host)
             self.host.provision_simple_endpoint(self)

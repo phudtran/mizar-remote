@@ -137,7 +137,7 @@ class network:
             self.netid, ip))
 
         self.endpoints[ip] = endpoint(
-            self.vni, self.netid, ip=ip, prefixlen=self.cidr.prefixlen, gw_ip=None, host=None)
+            self.vni, self.netid, ip=ip, prefixlen=self.cidr.prefixlen, gw_ip=None, host=None, netip=self.cidr.ip)
 
         # Now update the endpoint on the remaining switches
         for switch in self.transit_switches.values():
@@ -252,6 +252,16 @@ class network:
                         br, ep_i.bridge_port, out_port, ep_j.ip)
 
         return self.endpoints[ip]
+
+    def create_host_endpoint(self, ip, host):
+        logger.info("[NETWORK {}]: create_host_endpoint {}".format(
+            self.netid, ip))
+        self.endpoints[ip] = endpoint(
+            self.vni, self.netid, ip=ip, prefixlen=self.cidr.prefixlen, gw_ip=None, host=host, netip=self.cidr.ip, host_ep="yes")
+
+        # Now update the endpoint on the remaining switches
+        for switch in self.transit_switches.values():
+            switch.update_endpoint(self.endpoints[ip])
 
     def delete_simple_endpoint(self, ip, net_switches=None):
         """
