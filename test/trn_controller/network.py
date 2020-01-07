@@ -189,7 +189,7 @@ class network:
         start = time.time()
 
         self.endpoints[ip] = endpoint(
-            self.vni, self.netid, ip=ip, prefixlen=self.cidr.prefixlen, gw_ip=self.get_gw_ip(), host=host)
+            self.vni, self.netid, ip=ip, prefixlen=self.cidr.prefixlen, gw_ip=self.get_gw_ip(), host=host, netip=self.cidr.ip)
 
         switches[0].update_endpoint(self.endpoints[ip])
         self.endpoints[ip].update(temp_net)
