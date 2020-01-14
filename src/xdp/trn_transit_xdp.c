@@ -437,8 +437,6 @@ static __inline int trn_process_udp(struct transit_packet *pkt)
 	}
 
 	if (pkt->udp->dest != GEN_DSTPORT) {
-		bpf_debug("[Transit:%d:0x%x] PASS non-geneve packet \n",
-			  __LINE__, bpf_ntohl(pkt->itf_ipv4));
 		return XDP_PASS;
 	}
 

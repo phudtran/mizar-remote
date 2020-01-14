@@ -11,10 +11,10 @@ class test_host_ep(unittest.TestCase):
     def setUp(self):
 
         self.droplets = {
-            "d1": droplet("d1", droplet_type="linux", control_ip='172.31.30.230', benchmark=True, phy_itf='eth0'),
-            "d2": droplet("d2", droplet_type="linux", control_ip='172.31.30.6', benchmark=True, phy_itf='eth0'),
-            "d3": droplet("d3", droplet_type="linux", control_ip='172.31.29.230', benchmark=True, phy_itf='eth0'),
-            "d4": droplet("d4", droplet_type="linux", control_ip='172.31.21.76', benchmark=True, phy_itf='eth0'), }
+            "d1": droplet("d1", droplet_type="linux", control_ip='172.31.30.230', benchmark=False, phy_itf='eth0'),
+            "d2": droplet("d2", droplet_type="linux", control_ip='172.31.30.6', benchmark=False, phy_itf='eth0'),
+            "d3": droplet("d3", droplet_type="linux", control_ip='172.31.29.230', benchmark=False, phy_itf='eth0'),
+            "d4": droplet("d4", droplet_type="linux", control_ip='172.31.21.76', benchmark=False, phy_itf='eth0'), }
 
         c = controller(self.droplets)
 

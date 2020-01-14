@@ -254,17 +254,38 @@ ip netns exec {ep.ns} ifconfig veth0 hw ether {ep.mac} ' ''')
         """
         logger.info(
             "[DROPLET {}]: _create_veth_pair {}".format(self.id, self.control_ip))
+# This works
+#         script = (f''' sudo bash -c '\
+# mkdir -p /tmp/{ep.ns}_{ep.ip} && \
+# echo {ep.ip} > /tmp/{ep.ns}_{ep.ip}/index.html && \
+# ip netns add {ep.ns} && \
+# ip link add {ep.veth_name} type veth peer name {ep.veth_peer} && \
+# ip link set {ep.veth_name} netns {ep.ns} && \
+# ip netns exec {ep.ns} ip addr add {ep.ip}/{ep.prefixlen} dev {ep.veth_name} && \
+# ip netns exec {ep.ns} ip link set dev {ep.veth_name} up && \
+# ip netns exec {ep.ns} sysctl -w net.ipv4.tcp_mtu_probing=2 && \
+# ip netns exec {ep.ns} ethtool -K {ep.veth_name} tso off gso off ufo off && \
+# ip netns exec {ep.ns} ethtool --offload {ep.veth_name} rx off tx off && \
+# ip link set dev {ep.veth_peer} up mtu 9000 && \
+# ip netns exec {ep.ns} ip route add {ep.netip}/{ep.prefixlen} dev {ep.veth_name} \
+# ip netns exec {ep.ns} route add default gw {ep.gw_ip} &&  \
+# ip netns exec {ep.ns} ifconfig lo up &&  \
+# ip netns exec {ep.ns} ifconfig {ep.veth_name} hw ether {ep.mac} ' ''')
 
         script = (f''' sudo bash -c '\
+mkdir -p /tmp/{ep.ns}_{ep.ip} && \
+echo {ep.ip} > /tmp/{ep.ns}_{ep.ip}/index.html && \
+ip netns add {ep.ns} && \
 ip link add {ep.veth_name} type veth peer name {ep.veth_peer} && \
 ip link set dev {ep.veth_name} up && \
+ip addr add {ep.ip}/{ep.prefixlen} dev {ep.veth_name} && \
 sysctl -w net.ipv4.tcp_mtu_probing=2 && \
 ethtool -K {ep.veth_name} tso off gso off ufo off && \
 ethtool --offload {ep.veth_name} rx off tx off && \
-ip link set dev {ep.veth_name} up mtu 9000 && \
-route add default gw {ep.gw_ip} &&  \
-ifconfig lo up &&  \
-ip route {ep.netip} 255.255.255.0 {self.control_ip} ' ''')
+ip link set dev {ep.veth_peer} up mtu 9000 && \
+ip route add {ep.netip}/{ep.prefixlen} dev {ep.veth_name} && \
+route add default gw {ep.gw_ip} && \
+ifconfig {ep.veth_name} hw ether {ep.mac} ' ''')
 
         self.run(script)
         self.veth_peers.add(ep.veth_name)

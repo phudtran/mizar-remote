@@ -54,8 +54,10 @@ class endpoint:
         self.netip = netip
         self.host_ep = host_ep
         if host_ep:
-            self.veth_name = "veth_host"
-            self.veth_peer = "peer_host"
+            self.ns = "testns"
+            self.veth_name = "host_veth"
+            self.veth_peer = "host_peer"
+            self.ip = host.ip
 
         self.qvb = 'qvb-' + self.ns
         self.qvo = 'qvo-' + self.ns

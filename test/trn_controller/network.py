@@ -257,11 +257,12 @@ class network:
         logger.info("[NETWORK {}]: create_host_endpoint {}".format(
             self.netid, ip))
         self.endpoints[ip] = endpoint(
-            self.vni, self.netid, ip=ip, prefixlen=self.cidr.prefixlen, gw_ip=None, host=host, netip=self.cidr.ip, host_ep="yes")
+            self.vni, self.netid, ip=ip, prefixlen=self.cidr.prefixlen, gw_ip=self.get_gw_ip(), host=host, netip=self.cidr.ip, host_ep="yes")
 
         # Now update the endpoint on the remaining switches
         for switch in self.transit_switches.values():
             switch.update_endpoint(self.endpoints[ip])
+        self.endpoints[ip].update(self)
 
     def delete_simple_endpoint(self, ip, net_switches=None):
         """
